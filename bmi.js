@@ -1,3 +1,5 @@
+const readline = require("readline-sync");
+
 var weight=50;
 
 var height=160;
