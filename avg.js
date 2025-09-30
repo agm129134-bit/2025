@@ -10,7 +10,7 @@
 // var Score=[50,20,30,15,16,21,33,11,9,27];
 // console.log(Score.toString()+" average:"+ avg(Score));
 
-unction avg(Score){
+function avg(Score){
  var sum=0;//1
  for(var i=0;i<Score.length;i++){//n+1
     sum += Score[i];  //n
