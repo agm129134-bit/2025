@@ -10,7 +10,7 @@
 //test
 function sum(n){
     var result=0;
-    var i=0;
+    var i=1;
     do{
         result += i;
     }while(i++ < n);
