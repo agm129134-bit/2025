@@ -1,11 +1,11 @@
 function avg(score){
- var sum=0, average=0;
- for(var i=0;i<score.length;i++){
-    sum += score[i];
+ var sum=0, average=0;//1
+ for(var i=0;i<score.length;i++){//n+1
+    sum += score[i];  //n
 }
-if(score.length>0)
+if(score.length>0)//1
     average=sum/score.length;
-return average;
+return average;//1
 }
 //test
 var Score=[50,20,30,15,16,21,33,11,9,27];
