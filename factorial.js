@@ -9,9 +9,9 @@ function sum(n){
     if(n==1)
         return 1;
     else
-        return n+sum(n-1);
+        return n+sum(n);
 }
 
 //test
 var n=3;
-console.log(n+"!="+fact(n));
+console.log(n+"!="+fact(n-1));
