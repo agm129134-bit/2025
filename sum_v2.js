@@ -5,6 +5,7 @@ function sum2(n){
         console.log("error: n must >0");
         return;
     }else{
+        //O(n)
         for(var i=1;i<=n;i++){
             // if(i%2==0)  //even
             //     sum -= i;
@@ -13,9 +14,13 @@ function sum2(n){
             (i%2==0) ? sum -= i : sum += i;
         }
         return sum;
+        //O(1)
+        //return (i%2==0) ? (-1)*(n/2) : (n+1)/2;
     }
         
+
+
 }
         //test
-        var n=100;
+        var n=100;  //readline
         console.log("1-2+3-4=...+"+n+"="+sum2(n));
