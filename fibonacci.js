@@ -14,5 +14,5 @@ function fib(n){
     //     return fib(n-1)+fib(n-2);
 }
 //test
-var n=50
+var n=1476
 console.log("fibonacci "+n+"="+fib(n));
