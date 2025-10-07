@@ -1,4 +1,5 @@
 // iteration version
+//recursion O(2^n)
 function fib(n){
     //prevent n<0
     var a=0, b=1;
