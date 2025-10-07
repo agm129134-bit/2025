@@ -1,4 +1,4 @@
-//clac 1-2-3+3-4+...+n
+//clac 1-2+3-4+...+n
 function sum2(n){
     var sum=0;
     if (n<=0){
