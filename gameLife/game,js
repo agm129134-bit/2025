@@ -1,0 +1,22 @@
+const LIVE=1, DEAD=0;
+
+class life{
+    constructor(_row, _col){
+        this.row=_row;
+        this.col=_col;
+        this.grid=[]
+        //dynamic 2d array
+
+        for (let r = 0; r < this.row; r++) {
+            this.grid.push([]);
+            for (let c = 0; c < this.col; c++){
+                this.grid[r].push(0)
+            }
+        }
+    }
+}
+
+var myGame1= new life(10,10);
+var myGame2= new life(5,5);
+console.log(myGame1)
+console.log(myGame2)
