@@ -20,7 +20,7 @@ class life{
         }
     }
     getStatusAt = function(_row,_col){
-        if(_row<0 || _cow<0 || _row>=this.row || _col>=this.col){
+        if(_row<0 || _col<0 || _row>=this.row || _col>=this.col){
             return DEAD;//邊界外都當死掉
         }else{
             return this.grid[_row][_col];
@@ -40,7 +40,7 @@ class life{
     }
     update=function(){
         //建立新陣列 duplicate grid
-        var nextGrid= JSON.stringify(this.grid);
+        var nextGrid= JSON.parse(JSON.stringify(this.grid));
         for (let r = 0; r < this.row; r++) {
             for (let c = 0; c < this.col; c++){
                 var nCount = this.neighborCount(r,c);
