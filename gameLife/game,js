@@ -77,6 +77,6 @@ var myGame2= new life(5,5);
 // var myGame2= new life(row,col);//使用者輸入
 // myGame1.init(10);//初始活10個
 myGame2.init(10);//初始活10個
-myGame2.update(10);//更新10次
+myGame2.update();//更新1次
 // console.log(myGame1)
 console.log(myGame2.grid)
