@@ -89,8 +89,8 @@ class Board{
         //fill
         this.canvas.fillRect(_c*this.size,_r*this.size,this.size,this.size);
         //border
-        this.canvas.strokeStyle="#000000";
         this.canvas.strokeRect(_c*this.size,_r*this.size,this.size,this.size);
+        this.canvas.lineStyle = "#000000";
     }
     draw = function(){
         for (let r = 0; r < this.game.row; r++) {
