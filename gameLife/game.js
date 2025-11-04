@@ -102,7 +102,7 @@ class Board{
     }
 }
 // var myGame1= new life(20,10);
-var myGame2= new life(5,5);
+var myGame2= new life(20,20);
 myGame2.init(1);//初始活1個
 var myBoard = new Board(myGame2,"board");
 // var myGame2= new life(row,col);//使用者輸入
