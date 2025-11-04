@@ -1,118 +1,150 @@
-const LIVE=1, DEAD=0;
+const LIVE = 1, DEAD = 0
 
-// var readline= require("readline-sync");//問題輸入
-// var row = readline.questionInt("How many row?");//問題輸入
-// var col = readline.questionInt("How many col?");//問題輸入
-
-class life{
-    constructor(_row, _col){
-        this.row=_row;
-        this.col=_col;
-        this.grid=[]
+class Life {
+    constructor(_row, _col) {
+        this.row = _row;
+        this.col = _col;
+        this.grid = []
         //dynamic 2d array
-
-        var aryRowCol=[];//2d Array row x col
         for (let r = 0; r < _row; r++) {
             this.grid.push([]);
-            for (let c = 0; c < _col; c++){
-                this.grid[r].push(DEAD)//初始都死掉
+            for (let c = 0; c < _col; c++) {
+                this.grid[r].push(DEAD)
             }
         }
+
     }
-    getStatusAt = function(_row,_col){
-        if(_row<0 || _col<0 || _row>=this.row || _col>=this.col){
-            return DEAD;//邊界外都當死掉
-        }else{
-            return this.grid[_row][_col];
+    getStatusAt = function (_row, _col) {
+        if (_row < 0 || _col < 0 || _row >= this.row || _col >= this.col) {
+            return DEAD;
+        } else {
+            return this.grid[_row][_col]
         }
     }
-    neighborCount = function(_row,_col){
-        var count=0;
-        count+=this.getStatusAt(_row-1,_col-1);//左上
-        count+=this.getStatusAt(_row-1,_col);//上
-        count+=this.getStatusAt(_row-1,_col+1);//右上
-        count+=this.getStatusAt(_row,_col-1);//左
-        count+=this.getStatusAt(_row,_col+1);//右
-        count+=this.getStatusAt(_row+1,_col-1);//左下
-        count+=this.getStatusAt(_row+1,_col);//下
-        count+=this.getStatusAt(_row+1,_col+1);//右下
+    neighborCount = function (_row, _col) {
+        var count = 0;
+        count += this.getStatusAt(_row - 1, _col - 1);//left top
+        count += this.getStatusAt(_row - 1, _col);//up
+        count += this.getStatusAt(_row - 1, _col + 1);//right top
+        count += this.getStatusAt(_row, _col - 1);//left
+        count += this.getStatusAt(_row, _col + 1);//right
+        count += this.getStatusAt(_row + 1, _col - 1);//left bottom
+        count += this.getStatusAt(_row + 1, _col);//bottom
+        count += this.getStatusAt(_row + 1, _col + 1);//right bottom
         return count;
     }
-    update=function(){
-        //建立新陣列 duplicate grid
-        var nextGrid= JSON.parse(JSON.stringify(this.grid));
+    update = function () {
+        //duplicate grid
+        var nextGrid = JSON.parse(JSON.stringify(this.grid));
         for (let r = 0; r < this.row; r++) {
-            for (let c = 0; c < this.col; c++){
-                var nCount = this.neighborCount(r,c);
-                    //活著的規則
-                    //update
-                    if (this.grid[r][c]==LIVE && (nCount<2 || nCount>3)){
-                        nextGrid[r][c]=DEAD;//死掉
-                    }
-                    if(this.grid[r][c]==DEAD && nCount==3){
-                        nextGrid[r][c]=LIVE;//復活
-                }
+            for (let c = 0; c < this.col; c++) {
+                var nCount = this.neighborCount(r, c);
+                //update 
+                //exercise 
+                   if(this.grid[r][c]==LIVE && (nCount<2 || nCount>3) ) {
+                        nextGrid[r][c]=DEAD;
+                   }
+                   if(this.grid[r][c]==DEAD && nCount==3){
+                        nextGrid[r][c]=LIVE;
+                   }
+                // if (nCount < 2 || nCount > 3) {
+                //     nextGrid[r][c] = (this.grid[r][c] == LIVE) ? DEAD : LIVE;
+                // }
+                // if (nCount == 3)
+                //     nextGrid[r][c] = (this.grid[r][c] == DEAD) ? LIVE : DEAD;
             }
         }
-        this.grid=nextGrid;
+        this.grid = nextGrid;
         //garbage collection
         //gc()
-    }
-    init=function(nlive){
-        //random init
-        var randomCount=nlive;
-        while(randomCount>0){
-            var r=Math.floor(Math.random()*this.row);
-            var c=Math.floor(Math.random()*this.col);
-            if(this.grid[r][c]==DEAD){
-                this.grid[r][c]=LIVE;
-                randomCount--;
-            }
-        }
-    }
-}
 
+    }
+
+}
+//exercise
+//預設集
+var LifeSet = [
+{ name: "Pentomino", maxR: 2, maxC: 2, set: [{ r: 1, c: 0 }, { r: 2, c: 0 }, { r: 0, c: 1 }, { r: 1, c: 1 }, { r: 1, c: 2 }] },
+{ name: "Tumbler", maxR: 5, maxC: 5, set: [{ r: 1, c: 0 }, { r: 4, c: 0 }, { r: 1, c: 1 }, { r: 2, c: 1 }, { r: 3, c: 1 }, { r: 4, c: 1 }, { r: 0, c: 2 }, { r: 5, c: 2 }, { r: 0, c: 3 }, { r: 2, c: 3 }, { r: 3, c: 3 }, { r: 5, c: 3 }, { r: 0, c: 4 }, { r: 5, c: 4 }, { r: 1, c: 5 }, { r: 2, c: 5 }, { r: 3, c: 5 }, { r: 4, c: 5 }] },
+{ name: "Cheshire Cat", maxR: 6, maxC: 5, set: [{ r: 1, c: 0 }, { r: 2, c: 0 }, { r: 4, c: 0 }, { r: 5, c: 0 }, { r: 1, c: 1 }, { r: 2, c: 1 }, { r: 4, c: 1 }, { r: 5, c: 1 }, { r: 2, c: 2 }, { r: 4, c: 2 }, { r: 0, c: 3 }, { r: 2, c: 3 }, { r: 4, c: 3 }, { r: 6, c: 3 }, { r: 0, c: 4 }, { r: 2, c: 4 }, { r: 4, c: 4 }, { r: 6, c: 4 }, { r: 0, c: 5 }, { r: 1, c: 5 }, { r: 5, c: 5 }, { r: 6, c: 5 }] }
+]
+
+Life.prototype.init = function (type) {
+    //random
+    // var randCount=nLive;
+    // while(randCount>0){
+    //    var r=Math.floor(Math.random()*this.row);
+    //    var c=Math.floor(Math.random()*this.col);
+    //    if(this.grid[r][c]==DEAD){
+    //        this.grid[r][c]=LIVE;
+    //        randCount--;
+    //    }
+    // }
+    if (type > LifeSet.length || type < 0)
+        return;
+    var offsetRow = Math.floor((this.row - LifeSet[type].maxR) / 2);
+    var offsetCol = Math.floor((this.col - LifeSet[type].maxC) / 2);
+
+    //init by LifeSet[]
+    for (var i = 0; i < LifeSet[type].set.length; i++) {
+        this.grid[offsetRow + LifeSet[type].set[i].r][offsetCol + LifeSet[type].set[i].c] = LIVE;
+    }
+
+}
+//external
+// Life.prototype.getStatusAt = function(_row,_col){
+//     if(_row<0 || _col<0 || _row>=this.row || _col>=this.col){
+//         return DEAD;
+//     }else{
+//         this.grid[_row][_col]
+//     }
+// }
+
+// function getStatusAt(_row,_col){
+
+// }
 //draw board
 class Board{
     constructor(_game, _canvas){
         this.game=_game;
         this.canvas = document.getElementById(_canvas).getContext("2d");
-        var wsize = document.getElementById(_canvas).width/this.game.col;
-        var hsize = document.getElementById(_canvas).height/this.game.row;
-        this.size = Math.min(wsize,hsize)
-        this.canvas.lineStyle = "#000000";
+        //canvas width/game.col
+        var wSize = document.getElementById(_canvas).width/this.game.col;
+        var hSize = document.getElementById(_canvas).height/this.game.row;
+        this.size = Math.min(wSize, hSize)
     }
-    drawpoint = function(_r,_c){
+    drawPoint = function(_r, _c){
         if(this.game.grid[_r][_c]==LIVE)
-            this.canvas.fillStyle="#ff0000";//red
+            this.canvas.fillStyle = "#ff0000";//red
         else
-            this.canvas.fillStyle="#ffffff";//white
+            this.canvas.fillStyle = "#ffffff";//white
         //fill
-        this.canvas.fillRect(_c*this.size,_r*this.size,this.size,this.size);
+        this.canvas.fillRect(_c*this.size, _r*this.size, this.size, this.size);
         //border
-        this.canvas.strokeRect(_c*this.size,_r*this.size,this.size,this.size);
+        this.canvas.strokeRect(_c*this.size, _r*this.size, this.size, this.size);
         this.canvas.lineStyle = "#000000";
     }
     draw = function(){
         for (let r = 0; r < this.game.row; r++) {
-            for (let c = 0; c < this.game.col; c++){
-                this.drawpoint(r,c);
+            for (let c = 0; c < this.game.col; c++) {
+                this.drawPoint(r,c);
             }
-        }        
+            
+        }
     }
+
 }
-// var myGame1= new life(20,10);
-var myGame2= new life(20,20);
-myGame2.init(1);//初始活1個
-var myBoard = new Board(myGame2,"board");
-// var myGame2= new life(row,col);//使用者輸入
-// myGame1.init(10);//初始活10個
+
+
+var myGame1 = new Life(20, 20)
+myGame1.init(1);
+var myBoard = new Board(myGame1,"board");
 myBoard.draw();
 
 function toNext(){
-    myGame2.update();
-    myBoard.draw();
+   myGame1.update();
+   myBoard.draw(); 
 }
-myGame2.update();//更新1次
-// console.log(myGame1)
-console.log(myGame2.grid);
+var myGame2 = new Life(5, 5)
+myGame1.update()
+console.log(myGame1.grid)
