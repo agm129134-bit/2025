@@ -80,6 +80,7 @@ class Board{
         var wsize = document.getElementById(_canvas).width/this.game.col;
         var hsize = document.getElementById(_canvas).height/this.game.row;
         this.size = Math.min(wsize,hsize)
+        this.canvas.lineStyle = "#000000";
     }
     drawpoint = function(_r,_c){
         if(this.game.grid[_r][_c]==LIVE)
