@@ -1,6 +1,6 @@
 const LIVE=1, DEAD=0;
 
-var readline= require("readline-sync");//問題輸入
+// var readline= require("readline-sync");//問題輸入
 // var row = readline.questionInt("How many row?");//問題輸入
 // var col = readline.questionInt("How many col?");//問題輸入
 
@@ -72,11 +72,46 @@ class life{
     }
 }
 
-// var myGame1= new life(10,10);
+//draw board
+class Board{
+    constructor(_game, _canvas){
+        this.game=_game;
+        this.canvas = document.getElementById(_canvas).getContext("2d");
+        var wsize = document.getElementById(_canvas).width/this.game.col;
+        var hsize = document.getElementById(_canvas).height/this.game.row;
+        this.size = Math.min(wsize,hsize)
+    }
+    drawpoint = function(_r,_c){
+        if(this.game.grid[_r][_c]==LIVE)
+            this.canvas.fillStyle="#ff0000";//red
+        else
+            this.canvas.fillStyle="#ffffff";//white
+        //fill
+        this.canvas.fillRect(_c*this.size,_r*this.size,this.size,this.size);
+        //border
+        this.canvas.strokeStyle="#000000";
+        this.canvas.strokeRect(_c*this.size,_r*this.size,this.size,this.size);
+    }
+    draw = function(){
+        for (let r = 0; r < this.game.row; r++) {
+            for (let c = 0; c < this.game.col; c++){
+                this.drawpoint(r,c);
+            }
+        }        
+    }
+}
+// var myGame1= new life(20,10);
 var myGame2= new life(5,5);
+myGame2.init(1);//初始活1個
+var myBoard = new Board(myGame2,"board");
 // var myGame2= new life(row,col);//使用者輸入
 // myGame1.init(10);//初始活10個
-myGame2.init(10);//初始活10個
+myBoard.draw();
+
+function toNext(){
+    myGame2.update();
+    myBoard.draw();
+}
 myGame2.update();//更新1次
 // console.log(myGame1)
 console.log(myGame2.grid)
