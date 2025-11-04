@@ -114,4 +114,4 @@ function toNext(){
 }
 myGame2.update();//更新1次
 // console.log(myGame1)
-console.log(myGame2.grid)
+console.log(myGame2.grid);
