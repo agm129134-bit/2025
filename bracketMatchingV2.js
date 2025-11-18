@@ -19,11 +19,11 @@ class Stack {
 }
 
 
-var str = "{a = (1 + v(b[3 + <c[4]]))>"
-// console.log(str.charAt(0));
-console.log(bracketMatch(str));
+var str = "<{a = (1 + v(b[3 + c[4]]))}>"
 var open= "{[(<";//["{","[","("]
 var close="}])>";//["}","]",")"]
+// console.log(str.charAt(0));
+console.log(bracketMatch(str));
 
 function bracketMatch(str) {
     var bmStack = new Stack(100);
