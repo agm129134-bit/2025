@@ -1,53 +1,57 @@
-class Stack{
-    constructor(_max){
+class Stack {
+    constructor(_max) {
         this.max = _max;
         this.container = [];
     }
-    push(data){
+    push = function (data) {
         this.container.push(data);
     }
-    pop(){
+    pop = function () {
+        //isEmpty
         return this.container.pop();
     }
-    isEmpty(){
+    isEmpty = function () {
         return this.container.length == 0;
     }
-    isFull(){
+    isFull = function () {
         return this.container.length == this.max;
     }
 }
 
-var str = "a = (1 + v(b[3 + c[4]]))";
 
-console.log(bracketMatching(str));
+var str = "{a = (1 + v(b[3 + <c[4]]))>"
+// console.log(str.charAt(0));
+console.log(bracketMatch(str));
+var open= "{[(<";//["{","[","("]
+var close="}])>";//["}","]",")"]
 
-function bracketMatching(str){
-    var bmstack = new Stack(100);
-    for (let i=0; i<str.length; i++){
-        console.log(i + " char: " + str[i]);
-
-        // 左括號
-        if (str[i] == '{' || str[i] == '[' || str[i] == '('){
-            bmstack.push(str[i]);
+function bracketMatch(str) {
+    var bmStack = new Stack(100);
+    for (let i = 0; i < str.length; i++) {
+        console.log(i + " Char: " + str[i]);
+        //if (str[i] == '{' || str[i] == '[' || str[i] == '(') {
+        if(open.indexOf(str[i])>=0){
+            bmStack.push(str[i]);
         }
-
-        // 右括號
-        else if (str[i] == '}' || str[i] == ']' || str[i] == ')'){
-            if (bmstack.isEmpty()) return "unmatch";  // 多了一個右括號
-
-            var openning = bmstack.pop();
-
-            if(
-                (str[i] == '}' && openning != '{') ||
-                (str[i] == ']' && openning != '[') ||
-                (str[i] == ')' && openning != '(')
-            ){
-                return "unmatch";
+        //else if (str[i] == '}' || str[i] == ']' || str[i] == ')') {
+        else if(close.indexOf(str[i])>=0){
+            //isEmpty 
+            if(bmStack.isEmpty()){
+                return "unMatch";
+            }
+            var openning = bmStack.pop();
+           // if ((str[i] == '}' && openning == "{") || (str[i] == ']' && openning == "[") || (str[i] == ')' && openning == "(")) {
+            if(open.indexOf(openning)==close.indexOf(str[i])){
+                console.log("Open:"+openning+" Close:"+str[i]);
+            } else {
+                return "unMatch";
             }
         }
+       
     }
-
-    if(!bmstack.isEmpty()) return "unmatch"; // 左括號多了
-
-    return "match";
+    if(bmStack.isEmpty())
+        return "Match";//?
+    else
+        return "unMatch";
 }
+ 
