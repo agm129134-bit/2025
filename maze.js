@@ -53,8 +53,8 @@ do{
 //}while(!(CP.row==end.row && CP.col==end.col));
 }while(CP.row!=end.row || CP.col!=end.col);
 
-if(Stack.length>0){
-  //print path 
-
-
+if(CP.row!==end.row && CP.col!==end.col){
+    MAZE[CP.row][CP.col]=2;
+    console.log("Found the exit!");
 }
+console.table(MAZE);
