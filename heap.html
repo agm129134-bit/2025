@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>Heap Sort Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        input {
+            width: 300px;
+            padding: 5px;
+        }
+        button {
+            padding: 6px 12px;
+            margin-left: 10px;
+        }
+        .result {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Heap Sort（堆積排序）</h2>
+
+    <p>輸入數字（用逗號分隔）：</p>
+    <input type="text" id="inputArray" value="7,15,10,18,28,17,12,21,35,32">
+    <button onclick="doHeapSort()">排序</button>
+
+    <div class="result" id="result"></div>
+
+    <script>
+        // siftDown
+        Array.prototype.siftDown = function (pos, end) {
+            while (pos * 2 + 1 <= end) {
+                let left = pos * 2 + 1;
+                let right = pos * 2 + 2;
+                let maxChild = left;
+
+                if (right <= end && this[right] > this[left]) {
+                    maxChild = right;
+                }
+
+                if (this[pos] < this[maxChild]) {
+                    [this[pos], this[maxChild]] = [this[maxChild], this[pos]];
+                    pos = maxChild;
+                } else {
+                    return;
+                }
+            }
+        };
+
+        // heap sort
+        Array.prototype.heap = function () {
+            // 建立 max heap
+            for (let i = Math.floor(this.length / 2) - 1; i >= 0; i--) {
+                this.siftDown(i, this.length - 1);
+            }
+
+            // 排序
+            for (let last = this.length - 1; last > 0; last--) {
+                [this[0], this[last]] = [this[last], this[0]];
+                this.siftDown(0, last - 1);
+            }
+        };
+
+        function doHeapSort() {
+            const input = document.getElementById("inputArray").value;
+            const arr = input.split(",").map(Number);
+
+            if (arr.some(isNaN)) {
+                document.getElementById("result").innerText = "請輸入正確的數字格式！";
+                return;
+            }
+
+            arr.heap();
+
+            document.getElementById("result").innerText =
+                "排序結果：" + arr.join(", ");
+        }
+    </script>
+
+</body>
+</html>
