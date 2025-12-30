@@ -2,197 +2,127 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<title>Heap 樹狀動畫</title>
+<title>Heap Tree 動畫（滑動）</title>
 <style>
-    body {
-        font-family: Arial;
-        padding: 20px;
-    }
-    input {
-        width: 360px;
-        padding: 5px;
-    }
-    button {
-        padding: 6px 12px;
-        margin: 5px;
-    }
+body { font-family: Arial; padding: 20px; }
+input { width: 360px; }
+button { margin: 5px; }
 
-    svg {
-        border: 1px solid #ccc;
-        margin-top: 20px;
-        background: #fafafa;
-    }
+svg { border: 1px solid #ccc; background: #fafafa; }
 
-    .node {
-        fill: #90caf9;
-        stroke: #1565c0;
-        stroke-width: 2;
-        transition: fill 0.3s;
-    }
-
-    .active {
-        fill: #ffcc80;
-    }
-
-    .edge {
-        stroke: #555;
-        stroke-width: 2;
-    }
-
-    text {
-        font-size: 14px;
-        fill: #000;
-        text-anchor: middle;
-        dominant-baseline: middle;
-        font-weight: bold;
-    }
+.node circle {
+    fill: #90caf9;
+    stroke: #1565c0;
+    stroke-width: 2;
+}
+.node.active circle {
+    fill: #ffcc80;
+}
+.node {
+    transition: transform 0.6s;
+}
+.edge {
+    stroke: #555;
+    stroke-width: 2;
+}
+text {
+    font-size: 14px;
+    font-weight: bold;
+    text-anchor: middle;
+    dominant-baseline: middle;
+}
 </style>
 </head>
 <body>
 
-<h2>Heap 建堆過程（樹狀圖）</h2>
+<h2>Heap 建堆（樹狀滑動動畫）</h2>
 
-<p>輸入數字（逗號分隔）</p>
 <input id="input" value="7,15,10,18,28,17,12,21,35,32">
-
 <br>
 <button onclick="start()">建立 Heap</button>
-<button onclick="nextStep()">下一步</button>
-<button onclick="autoPlay()">自動播放</button>
+<button onclick="prev()">上一步</button>
+<button onclick="next()">下一步</button>
+<button onclick="auto()">自動播放</button>
 
-<svg id="tree" width="900" height="420"></svg>
+<svg id="svg" width="900" height="420"></svg>
 
 <script>
-let steps = [];
-let stepIndex = 0;
-let timer = null;
+let steps = [], idx = 0, timer;
 
-// 記錄步驟
-function record(array, highlight = []) {
-    steps.push({
-        array: [...array],
-        highlight
+// ========== Heap ==========
+const record = (a, h=[]) => steps.push({a:[...a], h});
+
+function siftDown(a, i, end){
+  while(i*2+1 <= end){
+    let l=i*2+1, r=l+1, m=l;
+    if(r<=end && a[r]>a[l]) m=r;
+    record(a,[i,m]);
+    if(a[i]<a[m]){
+      [a[i],a[m]]=[a[m],a[i]];
+      record(a,[i,m]);
+      i=m;
+    } else return;
+  }
+}
+
+const buildHeap = a => {
+  steps=[];
+  for(let i=Math.floor(a.length/2)-1;i>=0;i--)
+    siftDown(a,i,a.length-1);
+};
+
+// ========== Layout ==========
+const pos = i => {
+  let lv = Math.floor(Math.log2(i+1));
+  let k = i-(2**lv-1);
+  let gap = 900/(2**lv);
+  return { x:gap*k+gap/2, y:lv*80+40 };
+};
+
+// ========== Render ==========
+function render(step){
+  const svg = document.getElementById("svg");
+  const arr = step.a;
+
+  // edges
+  svg.innerHTML = "";
+  arr.forEach((_,i)=>{
+    let p=pos(i);
+    [2*i+1,2*i+2].forEach(c=>{
+      if(c<arr.length){
+        let q=pos(c);
+        svg.innerHTML+=`<line class="edge" x1="${p.x}" y1="${p.y}" x2="${q.x}" y2="${q.y}"/>`;
+      }
     });
+  });
+
+  // nodes
+  arr.forEach((v,i)=>{
+    let {x,y}=pos(i);
+    svg.innerHTML+=`
+      <g class="node ${step.h.includes(i)?'active':''}"
+         style="transform:translate(${x}px,${y}px)">
+        <circle r="22"></circle>
+        <text y="2">${v}</text>
+      </g>`;
+  });
 }
 
-// siftDown（有記錄）
-function siftDown(a, pos, end) {
-    while (pos * 2 + 1 <= end) {
-        let left = pos * 2 + 1;
-        let right = pos * 2 + 2;
-        let maxChild = left;
-
-        if (right <= end && a[right] > a[left]) {
-            maxChild = right;
-        }
-
-        record(a, [pos, maxChild]);
-
-        if (a[pos] < a[maxChild]) {
-            [a[pos], a[maxChild]] = [a[maxChild], a[pos]];
-            record(a, [pos, maxChild]);
-            pos = maxChild;
-        } else {
-            return;
-        }
-    }
+// ========== Controls ==========
+function start(){
+  clearInterval(timer);
+  idx=0;
+  let a=document.getElementById("input").value.split(",").map(Number);
+  if(a.some(isNaN)) return alert("輸入錯誤");
+  buildHeap(a);
+  render(steps[0]);
 }
-
-// 建堆
-function buildHeap(arr) {
-    steps = [];
-    for (let i = Math.floor(arr.length / 2) - 1; i >= 0; i--) {
-        siftDown(arr, i, arr.length - 1);
-    }
-}
-
-// 計算節點座標
-function getPosition(i, total) {
-    const level = Math.floor(Math.log2(i + 1));
-    const indexInLevel = i - (2 ** level - 1);
-    const nodesInLevel = 2 ** level;
-
-    const width = 900;
-    const gap = width / nodesInLevel;
-
-    const x = gap * indexInLevel + gap / 2;
-    const y = level * 80 + 40;
-
-    return { x, y };
-}
-
-// 畫樹
-function render(step) {
-    const svg = document.getElementById("tree");
-    svg.innerHTML = "";
-
-    const arr = step.array;
-
-    // 畫邑
-    arr.forEach((_, i) => {
-        const left = 2 * i + 1;
-        const right = 2 * i + 2;
-        const p = getPosition(i, arr.length);
-
-        if (left < arr.length) {
-            const c = getPosition(left, arr.length);
-            svg.innerHTML += `<line class="edge" x1="${p.x}" y1="${p.y}"
-                                   x2="${c.x}" y2="${c.y}" />`;
-        }
-        if (right < arr.length) {
-            const c = getPosition(right, arr.length);
-            svg.innerHTML += `<line class="edge" x1="${p.x}" y1="${p.y}"
-                                   x2="${c.x}" y2="${c.y}" />`;
-        }
-    });
-
-    // 畫節點
-    arr.forEach((v, i) => {
-        const { x, y } = getPosition(i, arr.length);
-        const active = step.highlight.includes(i);
-
-        svg.innerHTML += `
-            <circle class="node ${active ? 'active' : ''}" cx="${x}" cy="${y}" r="22"></circle>
-            <text x="${x}" y="${y}">${v}</text>
-        `;
-    });
-}
-
-// 控制
-function start() {
-    clearInterval(timer);
-    stepIndex = 0;
-
-    const input = document.getElementById("input").value;
-    const arr = input.split(",").map(Number);
-
-    if (arr.some(isNaN)) {
-        alert("請輸入正確數字");
-        return;
-    }
-
-    buildHeap(arr);
-    render(steps[0]);
-}
-
-function nextStep() {
-    if (stepIndex < steps.length - 1) {
-        stepIndex++;
-        render(steps[stepIndex]);
-    }
-}
-
-function autoPlay() {
-    clearInterval(timer);
-    timer = setInterval(() => {
-        if (stepIndex < steps.length - 1) {
-            stepIndex++;
-            render(steps[stepIndex]);
-        } else {
-            clearInterval(timer);
-        }
-    }, 800);
-}
+const next = () => idx<steps.length-1 && render(steps[++idx]);
+const prev = () => idx>0 && render(steps[--idx]);
+const auto = () => {
+  clearInterval(timer);
+  timer=setInterval(()=>idx<steps.length-1?render(steps[++idx]):clearInterval(timer),700);
+};
 </script>
 
 </body>
