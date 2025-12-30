@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<title>Heap Tree 動畫（滑動）</title>
+<title>Heap Sort 樹狀動畫</title>
 <style>
 body { font-family: Arial; padding: 20px; }
 input { width: 360px; }
@@ -11,35 +11,32 @@ button { margin: 5px; }
 svg { border: 1px solid #ccc; background: #fafafa; }
 
 .node circle {
-    fill: #90caf9;
-    stroke: #1565c0;
-    stroke-width: 2;
+  fill: #90caf9;
+  stroke: #1565c0;
+  stroke-width: 2;
 }
-.node.active circle {
-    fill: #ffcc80;
-}
-.node {
-    transition: transform 0.6s;
-}
-.edge {
-    stroke: #555;
-    stroke-width: 2;
-}
+.node.active circle { fill: #ffcc80; }
+.node.done circle { fill: #e0e0e0; stroke: #9e9e9e; }
+
+.node { transition: transform .6s; }
+
+.edge { stroke: #555; stroke-width: 2; }
+.edge.done { stroke-dasharray: 4; stroke: #aaa; }
+
 text {
-    font-size: 14px;
-    font-weight: bold;
-    text-anchor: middle;
-    dominant-baseline: middle;
+  font-size: 14px;
+  font-weight: bold;
+  text-anchor: middle;
+  dominant-baseline: middle;
 }
 </style>
 </head>
 <body>
 
-<h2>Heap 建堆（樹狀滑動動畫）</h2>
+<h2>Heap Sort（建堆＋排序）動畫</h2>
 
-<input id="input" value="7,15,10,18,28,17,12,21,35,32">
-<br>
-<button onclick="start()">建立 Heap</button>
+<input id="input" value="7,15,10,18,28,17,12,21,35,32"><br>
+<button onclick="start()">開始</button>
 <button onclick="prev()">上一步</button>
 <button onclick="next()">下一步</button>
 <button onclick="auto()">自動播放</button>
@@ -47,79 +44,94 @@ text {
 <svg id="svg" width="900" height="420"></svg>
 
 <script>
-let steps = [], idx = 0, timer;
+let steps=[], idx=0, timer;
 
-// ========== Heap ==========
-const record = (a, h=[]) => steps.push({a:[...a], h});
+// ===== 記錄 =====
+const record = (a, h=[], heapEnd=a.length-1) =>
+  steps.push({ a:[...a], h, heapEnd });
 
+// ===== Heap =====
 function siftDown(a, i, end){
-  while(i*2+1 <= end){
+  while(i*2+1<=end){
     let l=i*2+1, r=l+1, m=l;
     if(r<=end && a[r]>a[l]) m=r;
-    record(a,[i,m]);
+    record(a,[i,m],end);
     if(a[i]<a[m]){
       [a[i],a[m]]=[a[m],a[i]];
-      record(a,[i,m]);
+      record(a,[i,m],end);
       i=m;
     } else return;
   }
 }
 
-const buildHeap = a => {
+function heapSort(a){
   steps=[];
+  // 建堆
   for(let i=Math.floor(a.length/2)-1;i>=0;i--)
     siftDown(a,i,a.length-1);
+
+  // 排序
+  for(let end=a.length-1; end>0; end--){
+    record(a,[0,end],end);
+    [a[0],a[end]]=[a[end],a[0]];
+    record(a,[0,end],end-1);
+    siftDown(a,0,end-1);
+  }
+}
+
+// ===== 位置 =====
+const pos=i=>{
+  let lv=Math.floor(Math.log2(i+1));
+  let k=i-(2**lv-1);
+  let gap=900/(2**lv);
+  return {x:gap*k+gap/2,y:lv*80+40};
 };
 
-// ========== Layout ==========
-const pos = i => {
-  let lv = Math.floor(Math.log2(i+1));
-  let k = i-(2**lv-1);
-  let gap = 900/(2**lv);
-  return { x:gap*k+gap/2, y:lv*80+40 };
-};
-
-// ========== Render ==========
+// ===== Render =====
 function render(step){
-  const svg = document.getElementById("svg");
-  const arr = step.a;
+  const svg=document.getElementById("svg");
+  svg.innerHTML="";
+  const {a,h,heapEnd}=step;
 
   // edges
-  svg.innerHTML = "";
-  arr.forEach((_,i)=>{
-    let p=pos(i);
+  a.forEach((_,i)=>{
     [2*i+1,2*i+2].forEach(c=>{
-      if(c<arr.length){
-        let q=pos(c);
-        svg.innerHTML+=`<line class="edge" x1="${p.x}" y1="${p.y}" x2="${q.x}" y2="${q.y}"/>`;
+      if(c<a.length){
+        let p=pos(i), q=pos(c);
+        let done = c>heapEnd || i>heapEnd;
+        svg.innerHTML+=
+          `<line class="edge ${done?'done':''}"
+           x1="${p.x}" y1="${p.y}" x2="${q.x}" y2="${q.y}"/>`;
       }
     });
   });
 
   // nodes
-  arr.forEach((v,i)=>{
+  a.forEach((v,i)=>{
     let {x,y}=pos(i);
+    let cls="node";
+    if(h.includes(i)) cls+=" active";
+    if(i>heapEnd) cls+=" done";
     svg.innerHTML+=`
-      <g class="node ${step.h.includes(i)?'active':''}"
-         style="transform:translate(${x}px,${y}px)">
+      <g class="${cls}" style="transform:translate(${x}px,${y}px)">
         <circle r="22"></circle>
         <text y="2">${v}</text>
       </g>`;
   });
 }
 
-// ========== Controls ==========
+// ===== 控制 =====
 function start(){
   clearInterval(timer);
   idx=0;
   let a=document.getElementById("input").value.split(",").map(Number);
   if(a.some(isNaN)) return alert("輸入錯誤");
-  buildHeap(a);
+  heapSort(a);
   render(steps[0]);
 }
-const next = () => idx<steps.length-1 && render(steps[++idx]);
-const prev = () => idx>0 && render(steps[--idx]);
-const auto = () => {
+const next=()=>idx<steps.length-1&&render(steps[++idx]);
+const prev=()=>idx>0&&render(steps[--idx]);
+const auto=()=>{
   clearInterval(timer);
   timer=setInterval(()=>idx<steps.length-1?render(steps[++idx]):clearInterval(timer),700);
 };
