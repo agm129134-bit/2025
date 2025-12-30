@@ -1,87 +1,158 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <title>Heap Sort Demo</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-        }
-        input {
-            width: 300px;
-            padding: 5px;
-        }
-        button {
-            padding: 6px 12px;
-            margin-left: 10px;
-        }
-        .result {
-            margin-top: 15px;
-            font-weight: bold;
-        }
-    </style>
+<meta charset="UTF-8">
+<title>Heap 建堆動畫</title>
+<style>
+    body {
+        font-family: Arial;
+        padding: 20px;
+    }
+    input {
+        width: 350px;
+        padding: 5px;
+    }
+    button {
+        padding: 6px 12px;
+        margin: 5px;
+    }
+    .array {
+        display: flex;
+        margin-top: 20px;
+    }
+    .box {
+        width: 45px;
+        height: 45px;
+        border: 2px solid #333;
+        margin-right: 5px;
+        text-align: center;
+        line-height: 45px;
+        font-weight: bold;
+        transition: background 0.4s;
+    }
+    .active {
+        background: #ffd54f;
+    }
+    .swap {
+        background: #81c784;
+    }
+</style>
 </head>
 <body>
 
-    <h2>Heap Sort（堆積排序）</h2>
+<h2>Heap 建堆過程動畫（Max Heap）</h2>
 
-    <p>輸入數字（用逗號分隔）：</p>
-    <input type="text" id="inputArray" value="7,15,10,18,28,17,12,21,35,32">
-    <button onclick="doHeapSort()">排序</button>
+<p>輸入數字（逗號分隔）</p>
+<input id="input" value="7,15,10,18,28,17,12,21,35,32">
 
-    <div class="result" id="result"></div>
+<br>
+<button onclick="start()">建立 Heap</button>
+<button onclick="nextStep()">下一步</button>
+<button onclick="autoPlay()">自動播放</button>
 
-    <script>
-        // siftDown
-        Array.prototype.siftDown = function (pos, end) {
-            while (pos * 2 + 1 <= end) {
-                let left = pos * 2 + 1;
-                let right = pos * 2 + 2;
-                let maxChild = left;
+<div id="array" class="array"></div>
 
-                if (right <= end && this[right] > this[left]) {
-                    maxChild = right;
-                }
+<script>
+let arr = [];
+let steps = [];
+let stepIndex = 0;
+let timer = null;
 
-                if (this[pos] < this[maxChild]) {
-                    [this[pos], this[maxChild]] = [this[maxChild], this[pos]];
-                    pos = maxChild;
-                } else {
-                    return;
-                }
-            }
-        };
+// 記錄步驟
+function record(a, highlight = []) {
+    steps.push({
+        array: [...a],
+        highlight
+    });
+}
 
-        // heap sort
-        Array.prototype.heap = function () {
-            // 建立 max heap
-            for (let i = Math.floor(this.length / 2) - 1; i >= 0; i--) {
-                this.siftDown(i, this.length - 1);
-            }
+// siftDown（有記錄動畫）
+function siftDown(a, pos, end) {
+    while (pos * 2 + 1 <= end) {
+        let left = pos * 2 + 1;
+        let right = pos * 2 + 2;
+        let maxChild = left;
 
-            // 排序
-            for (let last = this.length - 1; last > 0; last--) {
-                [this[0], this[last]] = [this[last], this[0]];
-                this.siftDown(0, last - 1);
-            }
-        };
-
-        function doHeapSort() {
-            const input = document.getElementById("inputArray").value;
-            const arr = input.split(",").map(Number);
-
-            if (arr.some(isNaN)) {
-                document.getElementById("result").innerText = "請輸入正確的數字格式！";
-                return;
-            }
-
-            arr.heap();
-
-            document.getElementById("result").innerText =
-                "排序結果：" + arr.join(", ");
+        if (right <= end && a[right] > a[left]) {
+            maxChild = right;
         }
-    </script>
+
+        record(a, [pos, maxChild]);
+
+        if (a[pos] < a[maxChild]) {
+            [a[pos], a[maxChild]] = [a[maxChild], a[pos]];
+            record(a, [pos, maxChild]);
+            pos = maxChild;
+        } else {
+            return;
+        }
+    }
+}
+
+// 建堆
+function buildHeap(a) {
+    steps = [];
+    for (let i = Math.floor(a.length / 2) - 1; i >= 0; i--) {
+        siftDown(a, i, a.length - 1);
+    }
+}
+
+// 顯示陣列
+function render(step) {
+    const container = document.getElementById("array");
+    container.innerHTML = "";
+
+    step.array.forEach((v, i) => {
+        const div = document.createElement("div");
+        div.className = "box";
+        div.innerText = v;
+
+        if (step.highlight.includes(i)) {
+            div.classList.add("swap");
+        }
+
+        container.appendChild(div);
+    });
+}
+
+// 開始
+function start() {
+    clearInterval(timer);
+    stepIndex = 0;
+
+    const input = document.getElementById("input").value;
+    arr = input.split(",").map(Number);
+
+    if (arr.some(isNaN)) {
+        alert("請輸入正確的數字！");
+        return;
+    }
+
+    buildHeap(arr);
+    render(steps[0]);
+}
+
+// 下一步
+function nextStep() {
+    if (stepIndex < steps.length - 1) {
+        stepIndex++;
+        render(steps[stepIndex]);
+    }
+}
+
+// 自動播放
+function autoPlay() {
+    clearInterval(timer);
+    timer = setInterval(() => {
+        if (stepIndex < steps.length - 1) {
+            stepIndex++;
+            render(steps[stepIndex]);
+        } else {
+            clearInterval(timer);
+        }
+    }, 700);
+}
+</script>
 
 </body>
 </html>
