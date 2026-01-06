@@ -19,7 +19,7 @@ class OrderList{
         pos = (start>end) ? start : mid;
         this.data.splice(pos, 0, item);
     }
-    bSeaerch = function(item){
+    bSearch = function(item){
         var start=0, end=this.data.length;
         var mid;
         while(start<=end){
